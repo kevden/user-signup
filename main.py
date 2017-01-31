@@ -68,28 +68,28 @@ class Loggedin(webapp2.RequestHandler):
 		verify = self.request.get("verify")
 		email = self.request.get("email")
 
-		USER_RE = re.compile("^[a-zA-Z0-9_-]{3,20}$")	
-		PASSWORD_RE = re.compile("^[a-zA-Z0-9_-]{3,20}$")	
-		EMAIL_RE = re.compile("^[a-zA-Z0-9_-]{3,20}$")	
+		USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")	
+		PASSWORD_RE = re.compile(r"^.{3,20}$")	
+		EMAIL_RE = re.compile(r"^[\S]+@[\S]+.[\S]+$")	
 
 		def valid_username(username):
-			return USER_RE.match(username)
+			return username and  USER_RE.match(username)
 		def valid_password(password):
-			return PASSWORD_RE.match(password)
+			return password and PASSWORD_RE.match(password)
 		def valid_email(email):
-			return EMAIL_RE.match(email)
+			return not email or EMAIL_RE.match(email)
 
 		username_error = ''
 		password_error = ''
 		email_error = ''
 		verify_error = ''
-		if not valid_username or not username:
+		if not valid_username(username):
 			username_error = "invalid-username<br>"
-		if not valid_password or not password:
+		if not valid_password(password):
 			password_error = "invalid-password<br>"
-		if not valid_email:
+		if not valid_email(email):
 			email_error = "invalid-email<br>"
-		if not password == verify or not verify:
+		if not password == verify:
 			verify_error = "verify is not same as password<br>"
 		if username_error or email_error or verify_error or password_error:
 			self.redirect('/?error=' + username_error + password_error + email_error + verify_error)
